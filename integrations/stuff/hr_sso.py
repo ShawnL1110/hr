@@ -7,6 +7,10 @@ import json
 import os
 import re
 import secrets
+import logging
+import threading
+import time
+from collections import OrderedDict
 from urllib.parse import urlencode, urlsplit
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -25,6 +29,29 @@ def register(app):
     if len(client_secret) < 32:
         raise ValueError('HR client secret must have at least 32 random characters')
     store = Store(os.environ['HR_SSO_STORE'])
+
+    # Bound memory and auth-request frequency without logging codes/query strings.
+    buckets = OrderedDict()
+    limiter_lock = threading.Lock()
+    def throttle(request, route):
+        now = int(time.monotonic() // 60)
+        key = (route, request.client.host if request.client else 'unknown')
+        with limiter_lock:
+            window, count = buckets.pop(key, (now, 0))
+            count = count + 1 if window == now else 1
+            buckets[key] = (now, count)
+            while len(buckets) > 2048:
+                buckets.popitem(last=False)
+        if count > 120:
+            raise HTTPException(429, 'Too many login requests', headers={'Retry-After': '60'})
+
+    class SafeAccessLog(logging.Filter):
+        def filter(self, record):
+            args = record.args
+            if isinstance(args, tuple) and len(args) == 5 and str(args[2]).startswith('/api/hr-sso/'):
+                record.args = (*args[:2], str(args[2]).split('?', 1)[0], *args[3:])
+            return True
+    logging.getLogger('uvicorn.access').addFilter(SafeAccessLog())
 
     def client(request):
         expected = 'Bearer ' + client_secret
@@ -63,6 +90,7 @@ def register(app):
     @app.get('/api/hr-sso/authorize')
     def authorize(request: Request, client_id: str, redirect_uri: str, state: str,
                   code_challenge: str, code_challenge_method: str, response_type: str):
+        throttle(request, 'authorize')
         if client_id != 'newton-hr' or redirect_uri != callback or response_type != 'code' or code_challenge_method != 'S256':
             raise HTTPException(400, 'Invalid authorization request')
         if not re.fullmatch(r'[A-Za-z0-9_-]{32,128}', state):
@@ -82,6 +110,7 @@ def register(app):
 
     @app.post('/api/hr-sso/token')
     async def token(request: Request):
+        throttle(request, 'token')
         client(request)
         data = await payload(request)
         if data.get('grant_type') != 'authorization_code' or data.get('client_id') != 'newton-hr' or data.get('redirect_uri') != callback:

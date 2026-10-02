@@ -83,3 +83,12 @@ class ProviderTests(unittest.TestCase):
         r = self.authorize()
         self.assertEqual(302, r.status_code)
         self.assertTrue(r.headers['location'].startswith('/login?next='))
+
+    def test_authorize_and_exchange_are_rate_limited(self):
+        for _ in range(120):
+            self.assertEqual(302,self.authorize().status_code)
+        self.assertEqual(429,self.authorize().status_code)
+        for _ in range(120):
+            r=self.client.post('/api/hr-sso/token',json={})
+            self.assertEqual(401,r.status_code)
+        self.assertEqual(429,self.client.post('/api/hr-sso/token',json={}).status_code)

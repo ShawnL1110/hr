@@ -1,5 +1,5 @@
-# Dedicated HR host only. Merge into that host's existing Caddy imports.
 hr.newtonfin.com {
-    reverse_proxy 127.0.0.1:8080
-    header Strict-Transport-Security "max-age=31536000"
+    encode gzip
+    # No access log: authorization callbacks contain single-use codes.
+    reverse_proxy hr-app:8080
 }

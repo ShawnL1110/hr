@@ -16,9 +16,9 @@
 
 ## Remaining implementation (not complete)
 
-1. Obtain dedicated host SSH access and configure DNS `hr.newtonfin.com`. Inventory its
-   resources and existing ingress before deploying. Do not deploy to the shared stuff
-   host as an unapproved substitute. Update ops topology/monitoring only after actual setup.
+1. User approved co-location with finance/stuff on 35.42.59.31 on 2026-10-02.
+   Use an independent hr-app container, private data volume and limited resources,
+   with the existing Caddy ingress. DNS is configured; production rollout in progress.
 2. Compare live schema and deployed code to the inventory. Freeze a reproducible source
    revision including reviewed document/leave changes currently outside clean stuff main.
 3. Rehearse the independent schema and importer against the live backup; add versioned
