@@ -3,7 +3,9 @@
 Independent HR service for `hr.newtonfin.com`, extracted in stages from stuff.
 
 **Status: migration foundation; not a production replacement.** Personnel, contracts,
-recruitment, leave and payroll still run in stuff. This repository currently contains
+recruitment, leave and payroll writes still run in stuff. The HR pilot now supports
+scoped read-only employee profiles, document downloads, leave balances/history and
+attendance records from an imported HR database. This repository currently contains
 an independent service with tested SSO client/provider integration, HR export tooling,
 source inventory, independent data models/importer, the extracted leave engine, and payroll reconciliation tooling. No production cutover has occurred.
 
@@ -44,6 +46,7 @@ Use a private SQLite backup and an operator-only output directory. Never commit 
 python -m hr.migration export --source /private/backup/collection.db --destination private/bundle
 python -m hr.migration verify private/bundle
 python -m hr.import_bundle private/bundle --destination private/hr.db
+python -m hr.attachments private/bundle --destination private/files --root /data/proofs=/private/backup/proofs
 python tools/capture_payroll_baseline.py --source-repo /path/to/stuff --source-backup /private/backup/collection.db --week 2026-09-21 --output private/baseline.json
 python -m hr.reconcile private/baseline.json private/hr-calculation.json
 ```
@@ -55,6 +58,7 @@ all tables use one consistent read transaction, output uses explicit allowlists,
 IDs, restrictive file permissions, hashes and row counts. Active signature OTPs are
 invalidated; historical signing audit and assignments remain. Unknown HR columns stop
 export instead of silently losing data. The importer creates a new isolated database, checks every foreign key and refuses overwrite.
-Attachment transfer and production migration rehearsal remain pending.
+The attachment copier transfers only HR-referenced files and verifies original hashes.
+Production migration rehearsal remains pending. See [pilot operation](docs/pilot.md).
 
 See [implementation status](docs/implementation.md) and [SSO integration](docs/sso.md).

@@ -56,3 +56,11 @@ results before separately approving a policy change.
 
 The export tool intentionally sets `cutover_ready=false`; file hashes and row counts
 alone cannot certify payroll parity, cross-system roles or correct employee visibility.
+
+## Second implementation batch
+
+Read-only pilot pages/APIs are implemented for employee profiles, contracts, leave and
+attendance; read grants are split by module. Attachment copy/verification is implemented
+for explicit HR references, including company signature artwork. Browser walkthrough and
+permission/attachment tests use synthetic data. This advances steps 3–5 above, but does
+not complete writable business workflows, live migration, payroll or production cutover.

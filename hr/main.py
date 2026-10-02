@@ -10,6 +10,8 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from .session import Sessions
+from . import portal
+from fastapi.staticfiles import StaticFiles
 
 COOKIE = '__Host-hr-session'
 LOGIN_COOKIE = '__Host-hr-login'
@@ -67,6 +69,12 @@ def create_app(settings=None, transport=None):
         if not isinstance(identity.get('sub'), str) or not isinstance(identity.get('username'), str):
             raise HTTPException(503, '身份响应不完整')
         identity['hr_admin'] = identity['sub'] in admins
+        permissions = []
+        for key, permission in [('HR_PROFILE_SUBJECTS','profile.read_all'), ('HR_LEAVE_SUBJECTS','leave.read_all'), ('HR_DOCUMENT_SUBJECTS','documents.read_all')]:
+            subjects = {x.strip() for x in settings.get(key, '').split(',') if x.strip()}
+            if identity['hr_admin'] or identity['sub'] in subjects:
+                permissions.append(permission)
+        identity['permissions'] = permissions
         return identity, session
 
     @app.get('/healthz')
@@ -113,12 +121,19 @@ def create_app(settings=None, transport=None):
         if not sessions.get(request.cookies.get(COOKIE), 'session'):
             return RedirectResponse('/login', status_code=302)
         identity, session = await current(request)
-        return HTMLResponse('<!doctype html><html lang="zh"><meta charset="utf-8"><title>Newton HR</title>'
-            '<h1>Newton HR</h1><p>'+escape(identity['username'])+'，欢迎。</p>'
-            '<p>HR 独立站正在迁移验证，现阶段请继续在 stuff 办理人事业务。</p>'
-            '<p><a href="https://stuff.newtonfin.com">返回 stuff</a></p>'
+        return HTMLResponse('<!doctype html><html lang="zh"><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Newton HR</title>'
+            '<link rel="stylesheet" href="/static/portal.css"><script src="/static/portal.js" defer></script></head><body>'
+            '<header><h1>Newton HR</h1><span>'+escape(identity['username'])+'</span>'
+            '<a href="https://stuff.newtonfin.com">返回 stuff</a>'
             '<form method="post" action="/logout"><input type="hidden" name="csrf" value="'+escape(session['csrf'])+'">'
-            '<button>退出 HR</button></form></html>')
+            '<button>退出 HR</button></form></header><main><p class="notice">试运行 · 当前仅供查阅；修改资料、申请请假及签署合同请继续在 stuff 办理。</p>'
+            '<p><label>员工 <select id="employee"><option value="">我的资料</option></select></label></p>'
+            '<nav><button data-tab="profile">员工档案</button><button data-tab="documents">合同与文件</button>'
+            '<button data-tab="leave">请假记录</button><button data-tab="attendance">出勤记录</button></nav>'
+            '<div id="dates" hidden><input id="from" type="date" aria-label="开始日期"> — '
+            '<input id="to" type="date" aria-label="结束日期"><button id="filter">查询</button></div>'
+            '<section id="content" aria-live="polite"></section></main></body></html>')
 
     @app.post('/logout')
     async def logout(request: Request):
@@ -147,4 +162,6 @@ def create_app(settings=None, transport=None):
         response.delete_cookie(COOKIE, path='/', secure=True, httponly=True, samesite='lax')
         return response
 
+    portal.register(app, current, settings)
+    app.mount('/static', StaticFiles(directory=Path(__file__).parent/'static'), name='static')
     return app
