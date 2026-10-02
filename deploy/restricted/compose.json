@@ -1,0 +1,58 @@
+{
+  "services": {
+    "hr-app": {
+      "image": "hr-managed:active",
+      "container_name": "hr-app",
+      "restart": "unless-stopped",
+      "env_file": [
+        "/opt/hr/.env"
+      ],
+      "environment": {
+        "HR_DATA_DIR": "/data"
+      },
+      "volumes": [
+        "hr-data:/data"
+      ],
+      "networks": [
+        "hr_frontend"
+      ],
+      "mem_limit": "256m",
+      "memswap_limit": "384m",
+      "cpus": 0.5,
+      "user": "10001:10001",
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:size=64m,mode=1777"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "cap_drop": [
+        "ALL"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz',timeout=3)"
+        ],
+        "interval": "5s",
+        "timeout": "5s",
+        "retries": 3
+      }
+    }
+  },
+  "volumes": {
+    "hr-data": {
+      "external": true,
+      "name": "hr_hr-data"
+    }
+  },
+  "networks": {
+    "hr_frontend": {
+      "external": true,
+      "name": "hr_frontend"
+    }
+  }
+}
