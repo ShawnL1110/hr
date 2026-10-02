@@ -41,3 +41,18 @@ class ImportTests(unittest.TestCase):
             load(self.root/'bundle', self.root/'hr.db')
         self.assertFalse((self.root/'hr.db').exists())
         self.assertEqual([], list(self.root.glob('.hr-import-*')))
+
+
+    def test_legacy_actor_username_requires_explicit_resolution(self):
+        with closing(sqlite3.connect(self.source)) as c, c:
+            c.execute("INSERT INTO daily_work_entry(id,date,employee_id,submitted_by) VALUES (1,'2026-10-01',42,'fixture')")
+        export(self.source,self.root/'bundle')
+        with self.assertRaisesRegex(ValueError,'Foreign-key'):
+            load(self.root/'bundle',self.root/'hr.db')
+        load(self.root/'bundle',self.root/'hr.db',resolve_legacy_audit_usernames=True)
+        with closing(sqlite3.connect(self.root/'hr.db')) as c:
+            self.assertEqual((7,),c.execute('SELECT submitted_by FROM daily_work_entry WHERE id=1').fetchone())
+            self.assertEqual(1,c.execute('SELECT count(*) FROM hr_import_notes').fetchone()[0])
+            self.assertEqual([],list(c.execute('PRAGMA foreign_key_check')))
+        with closing(sqlite3.connect(self.source)) as c:
+            self.assertEqual(('fixture',),c.execute('SELECT submitted_by FROM daily_work_entry WHERE id=1').fetchone())

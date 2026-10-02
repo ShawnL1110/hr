@@ -11,7 +11,7 @@ from .migration import verify, INVENTORY, PROJECTIONS, quote
 from .models import Base
 
 
-def load(bundle, destination):
+def load(bundle, destination, resolve_legacy_audit_usernames=False):
     bundle, destination = Path(bundle), Path(destination).absolute()
     if destination.exists():
         raise ValueError('Refusing to overwrite HR database')
@@ -46,6 +46,20 @@ def load(bundle, destination):
                             values = [row[k] for k in columns]
                             values = [base64.b64decode(v['$binary'], validate=True) if isinstance(v, dict) and set(v)=={'$binary'} else v for v in values]
                             c.execute(sql, values)
+                # Legacy attendance sometimes saved a username in the actor-ID column.
+                # Resolve only an exact, unique source identity; keep original evidence.
+                if resolve_legacy_audit_usernames:
+                    missing = list(c.execute("SELECT d.id,d.submitted_by FROM daily_work_entry d LEFT JOIN user u ON u.id=d.submitted_by WHERE d.submitted_by IS NOT NULL AND u.id IS NULL"))
+                    c.execute('CREATE TABLE hr_import_notes(kind TEXT, source_id INTEGER, detail TEXT)')
+                    for record_id, actor in missing:
+                        if not isinstance(actor,str):
+                            continue
+                        matches = list(c.execute('SELECT id FROM user WHERE username=?',(actor,)))
+                        if len(matches) != 1:
+                            continue
+                        uid = matches[0][0]
+                        c.execute('UPDATE daily_work_entry SET submitted_by=? WHERE id=?',(uid,record_id))
+                        c.execute('INSERT INTO hr_import_notes VALUES (?,?,?)', ('legacy_audit_username',record_id,json.dumps({'original_actor':actor,'resolved_user_id':uid})))
                 errors = list(c.execute('PRAGMA foreign_key_check'))
                 if errors:
                     raise ValueError('Foreign-key reconciliation failed: '+str([(r[0],r[2]) for r in errors[:20]]))
@@ -66,8 +80,9 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('bundle', type=Path)
     p.add_argument('--destination', type=Path, required=True)
+    p.add_argument('--resolve-legacy-audit-usernames', action='store_true')
     args = p.parse_args()
-    print(json.dumps(load(args.bundle, args.destination)))
+    print(json.dumps(load(args.bundle, args.destination, args.resolve_legacy_audit_usernames)))
 
 
 if __name__ == '__main__':
