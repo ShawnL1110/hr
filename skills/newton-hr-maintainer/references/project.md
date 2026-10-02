@@ -33,3 +33,5 @@
 ## 上线状态更新（2026-10-02）
 
 用户已改为立即上线，HR 独立域名和 stuff SSO 已启用。真实账号登录及业务页面由 HR 团队验收，尚未代替团队确认。当前仍为只读静态快照，stuff 继续写入。实际部署使用 `/etc/newton-hr-deploy/compose.json` 固定策略；团队日常使用 `deploy/restricted/client.sh`，不要按旧文档直接运行 `/opt/hr/compose.yaml`。原 14:00 自动部署已暂停。以 `docs/shared-host-deployment.md` 最新记录为准。
+
+HR专用发布通道已激活并实测成功：运行版本 d401152，固定平台镜像策略已修复 BuildKit 兼容性；发布时仅重建 hr-app。真实登录和业务页面验收按用户要求交由 HR 团队完成。

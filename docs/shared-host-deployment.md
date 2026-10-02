@@ -62,3 +62,5 @@ and ordinary employee scopes; inspect profile, contract downloads, leave and
 attendance against the snapshot. Report discrepancies with page/time and role,
 without sharing credentials. Business writes and automatic synchronization remain
 out of scope for this read-only pilot. Keep stuff as the authoritative writer.
+
+Restricted deployment activated and successfully exercised at revision d401152. HR-only SQLite backup: /var/lib/newton-hr-deploy/backups/1790939676718459131. The approved runtime ID is rebound to a platform-owned local tag for BuildKit; uploaded build files remain ignored.
