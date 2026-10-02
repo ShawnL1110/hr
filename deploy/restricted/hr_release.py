@@ -100,7 +100,11 @@ def main():
         base = (POLICY/'runtime-image').read_text().strip()
         if not re.fullmatch(r'sha256:[0-9a-f]{64}',base):
             raise ValueError('Invalid fixed runtime image')
-        (context/'Dockerfile').write_text('FROM '+base+'\nUSER root\nRUN rm -rf /app/hr /app/docs\nCOPY --chown=10001:10001 hr /app/hr\nCOPY --chown=10001:10001 docs /app/docs\nUSER 10001\n')
+        # BuildKit FROM needs a named local reference, not a bare image ID.
+        # Rebind a platform-only tag from the approved immutable ID each release.
+        runtime_tag = 'hr-runtime:'+base.split(':',1)[1]
+        run(DOCKER,'tag',base,runtime_tag)
+        (context/'Dockerfile').write_text('FROM '+runtime_tag+'\nUSER root\nRUN rm -rf /app/hr /app/docs\nCOPY --chown=10001:10001 hr /app/hr\nCOPY --chown=10001:10001 docs /app/docs\nUSER 10001\n')
         image = 'hr-release:'+sha
         run(DOCKER,'build','--network','none','--tag',image,str(context))
         # Back up the HR SQLite only; no stuff mount or key is accessible to this job.
