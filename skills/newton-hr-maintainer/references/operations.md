@@ -1,6 +1,6 @@
 # 部署与隔离
 
-HR 团队负责HR仓库；HR限定发布入口正在随本次交接准备，首次14:00上线验收后激活。**以下主机操作由平台维护方执行，或在以后已配置且验证的 HR 限定发布通道内执行。**不能通过获得 Docker 组、无限 sudo、ubuntu/root 密钥来“只部署 HR”。Docker 控制权等同于主机控制权。
+HR 团队负责HR仓库；HR限定发布账号及根拥有策略已安装，首次14:00上线验收后激活。**以下主机操作由平台维护方执行，或在以后已配置且验证的 HR 限定发布通道内执行。**不能通过获得 Docker 组、无限 sudo、ubuntu/root 密钥来“只部署 HR”。Docker 控制权等同于主机控制权。
 
 拓扑：唯一公网入口 kyc-caddy-1，导入 `/opt/caddy-sites/*.caddy`。HR 独立文件 `/opt/caddy-sites/hr.caddy` → hr-app:8080；HR专属网 hr_frontend（首次上线由平台方连接Caddy并持久化配置），不连接兄弟应用网络。不得发布宿主8080或另外启动反代。修改Caddy由平台方负责，仅validate+reload，不restart或覆盖总配置。
 
