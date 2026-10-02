@@ -29,3 +29,7 @@
 - `docs/implementation.md`：剩余工作；`docs/pilot.md`：试运行限制；`docs/sso.md`：登录契约；`docs/shared-host-deployment.md`：部署/导入说明。
 
 后续建议按模块推进：完善只读试运行与权限管理 → 档案/请假独立写入 → 合同/签署审计 → 招聘 → 薪酬输入接口与完整周期对账 → 各模块正式切换。每步都明确数据新鲜度和写入归属。
+
+## 上线状态更新（2026-10-02）
+
+用户已改为立即上线，HR 独立域名和 stuff SSO 已启用。真实账号登录及业务页面由 HR 团队验收，尚未代替团队确认。当前仍为只读静态快照，stuff 继续写入。实际部署使用 `/etc/newton-hr-deploy/compose.json` 固定策略；团队日常使用 `deploy/restricted/client.sh`，不要按旧文档直接运行 `/opt/hr/compose.yaml`。原 14:00 自动部署已暂停。以 `docs/shared-host-deployment.md` 最新记录为准。

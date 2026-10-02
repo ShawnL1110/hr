@@ -25,3 +25,7 @@ HR服务：/opt/hr/compose.yaml，卷hr_hr-data挂载/data，UID10001；只读�
 ## 权限落地建议
 
 给每人独立GitHub访问，保护发布分支；生产部署由独立工作流/平台方完成。若以后需要SSH，仅使用各人提交的公钥和强制命令发布通道，固定仓库、服务、数据路径及资源限制，不提供通用shell/sudo/Docker组。实现前由平台方验证无法操作兄弟服务。技能约定不能替代这些操作系统权限边界。
+
+## 上线状态更新（2026-10-02）
+
+用户已改为立即上线，HR 独立域名和 stuff SSO 已启用。真实账号登录及业务页面由 HR 团队验收，尚未代替团队确认。当前仍为只读静态快照，stuff 继续写入。实际部署使用 `/etc/newton-hr-deploy/compose.json` 固定策略；团队日常使用 `deploy/restricted/client.sh`，不要按旧文档直接运行 `/opt/hr/compose.yaml`。原 14:00 自动部署已暂停。以 `docs/shared-host-deployment.md` 最新记录为准。

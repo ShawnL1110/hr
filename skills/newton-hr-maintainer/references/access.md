@@ -15,3 +15,7 @@
 SSO轮换：由平台方同时更新HR和stuff的专用客户端凭据，协调提供端和客户端生效；单方面改HR会导致登录失败。人员离组撤销其GitHub/发布权限，若曾接触生产SSO密钥则协调轮换。不要打印旧值/新值到日志或聊天。
 
 GitHub邀请由所有者自行处理。初始交接包使用一把HR限定部署密钥；后续应为不同人员配置可单独撤销的公钥。接手前确认平台已激活发布通道；本skill不能代替GitHub邀请或部署激活。
+
+## 上线状态更新（2026-10-02）
+
+用户已改为立即上线，HR 独立域名和 stuff SSO 已启用。真实账号登录及业务页面由 HR 团队验收，尚未代替团队确认。当前仍为只读静态快照，stuff 继续写入。实际部署使用 `/etc/newton-hr-deploy/compose.json` 固定策略；团队日常使用 `deploy/restricted/client.sh`，不要按旧文档直接运行 `/opt/hr/compose.yaml`。原 14:00 自动部署已暂停。以 `docs/shared-host-deployment.md` 最新记录为准。
