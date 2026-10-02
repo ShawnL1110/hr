@@ -1,0 +1,9 @@
+.git
+.env*
+data
+private
+*.db
+*.pem
+*.key
+.venv
+__pycache__

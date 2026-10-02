@@ -1,0 +1,594 @@
+{
+  "source": "Newton-Fintech-Stuff",
+  "models_sha256": "f50c2cedf41ba33f3317ad510445a84f78671194f878f9072f1f2d2627b11294",
+  "tables": [
+    {
+      "model": "Employee",
+      "table": "employee",
+      "columns": [
+        "id",
+        "name",
+        "team_id",
+        "track",
+        "plan_id",
+        "salary_plan",
+        "emp_type",
+        "phone",
+        "phone_changed_at",
+        "contract_type",
+        "status",
+        "start_date",
+        "end_date",
+        "daily_hours",
+        "work_days",
+        "sat_ot_hours",
+        "base_weekly",
+        "allowance_daily",
+        "bank_holder",
+        "bank_id",
+        "bank_iban",
+        "bank_name",
+        "birth_date",
+        "email",
+        "ssn",
+        "address",
+        "ss_scan_path",
+        "id_scan_path",
+        "reg_date",
+        "emp_category",
+        "clausula_desplazamiento",
+        "anexo1_ordenador",
+        "anexo1_movil",
+        "anexo1_linea",
+        "anexo1_comp_equipo_propio",
+        "anexo1_reembolso_telefonia",
+        "anexo1_observaciones",
+        "puesto",
+        "tipo_contrato",
+        "grupo_profesional",
+        "centro_trabajo",
+        "created_at"
+      ],
+      "references": [
+        "team.id",
+        "salary_plan.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "LeaderAttend",
+      "table": "leader_attend",
+      "columns": [
+        "id",
+        "employee_id",
+        "week_start",
+        "days",
+        "updated_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "PayAdjustment",
+      "table": "pay_adjustment",
+      "columns": [
+        "id",
+        "week_start",
+        "employee_id",
+        "kind",
+        "amount",
+        "note",
+        "created_by",
+        "created_at"
+      ],
+      "references": [
+        "employee.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "PkBonus",
+      "table": "pk_bonus",
+      "columns": [
+        "id",
+        "date",
+        "employee_id",
+        "amount",
+        "note",
+        "created_by",
+        "updated_at"
+      ],
+      "references": [
+        "employee.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "SalaryPlan",
+      "table": "salary_plan",
+      "columns": [
+        "id",
+        "track",
+        "name",
+        "is_default",
+        "active",
+        "note",
+        "created_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "SalaryPlanVersion",
+      "table": "salary_plan_version",
+      "columns": [
+        "id",
+        "plan_id",
+        "track",
+        "effective_date",
+        "label",
+        "pay_mode",
+        "base_weekly",
+        "allowance_daily",
+        "hourly",
+        "leader_hourly",
+        "hours",
+        "position_daily",
+        "wa_monthly",
+        "full_attend_daily",
+        "transport_daily",
+        "settle_bonus",
+        "perf_bands"
+      ],
+      "references": [
+        "salary_plan.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "WorkHoursTier",
+      "table": "work_hours_tier",
+      "columns": [
+        "id",
+        "max_cases",
+        "hours"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "StagePerCase",
+      "table": "stage_per_case",
+      "columns": [
+        "id",
+        "stage",
+        "emp_type",
+        "rate"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "StagePerCaseVersion",
+      "table": "stage_per_case_version",
+      "columns": [
+        "id",
+        "stage",
+        "emp_type",
+        "rate",
+        "effective_date",
+        "created_by",
+        "created_at"
+      ],
+      "references": [
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "WeeklyPayslip",
+      "table": "weekly_payslip",
+      "columns": [
+        "id",
+        "week_start",
+        "employee_id",
+        "status",
+        "net_pay",
+        "breakdown",
+        "confirmed_by",
+        "confirmed_at"
+      ],
+      "references": [
+        "employee.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "Candidate",
+      "table": "candidate",
+      "columns": [
+        "id",
+        "name",
+        "position",
+        "phone",
+        "resume_path",
+        "interview_time",
+        "interview_link",
+        "interview_confirmed",
+        "interview_opinion",
+        "onboard_date",
+        "probation_end",
+        "probation_opinion",
+        "status",
+        "parse_status",
+        "declined",
+        "note",
+        "created_by",
+        "created_at",
+        "updated_at"
+      ],
+      "references": [
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "LeaveType",
+      "table": "leave_type",
+      "columns": [
+        "id",
+        "code",
+        "name_zh",
+        "name_es",
+        "applies_to",
+        "payable",
+        "nature",
+        "unit",
+        "advance_days",
+        "proof_required",
+        "proof_hint",
+        "quota_rule",
+        "quota_value",
+        "period_basis",
+        "carryover",
+        "sort",
+        "active",
+        "created_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "LeaveEntitlement",
+      "table": "leave_entitlement",
+      "columns": [
+        "id",
+        "employee_id",
+        "leave_type_id",
+        "period",
+        "quota",
+        "used",
+        "pending",
+        "override_by",
+        "override_note",
+        "updated_at"
+      ],
+      "references": [
+        "employee.id",
+        "leave_type.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "LeaveRequest",
+      "table": "leave_request",
+      "columns": [
+        "id",
+        "employee_id",
+        "contract_type",
+        "leave_type_id",
+        "date_from",
+        "date_to",
+        "amount",
+        "reason",
+        "proof_path",
+        "proof_pending",
+        "advance_ok",
+        "status",
+        "period",
+        "decided_by",
+        "decided_at",
+        "decide_reason",
+        "created_by",
+        "created_at"
+      ],
+      "references": [
+        "employee.id",
+        "leave_type.id",
+        "user.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "LeaveApproval",
+      "table": "leave_approval",
+      "columns": [
+        "id",
+        "request_id",
+        "actor_id",
+        "actor_role",
+        "action",
+        "reason",
+        "created_at"
+      ],
+      "references": [
+        "leave_request.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocType",
+      "table": "empdoc_type",
+      "columns": [
+        "id",
+        "name_es",
+        "name_zh",
+        "default_mode",
+        "min_mode",
+        "max_mode",
+        "default_text_key",
+        "use_template",
+        "needs_efectos",
+        "personal",
+        "external_warn",
+        "sort",
+        "active",
+        "created_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocText",
+      "table": "empdoc_text",
+      "columns": [
+        "id",
+        "usage_key",
+        "kind",
+        "label_zh",
+        "text_es",
+        "sort",
+        "active",
+        "updated_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocPackage",
+      "table": "empdoc_package",
+      "columns": [
+        "id",
+        "code",
+        "pusher_user_id",
+        "declaration",
+        "check_text",
+        "audience_json",
+        "status",
+        "is_test",
+        "created_at"
+      ],
+      "references": [
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocFile",
+      "table": "empdoc_file",
+      "columns": [
+        "id",
+        "package_id",
+        "doc_type_id",
+        "mode",
+        "name",
+        "version",
+        "filename",
+        "fecha_efectos",
+        "template_id",
+        "check_text",
+        "pdf_path",
+        "sha256",
+        "personal",
+        "sort",
+        "created_at"
+      ],
+      "references": [
+        "empdoc_package.id",
+        "empdoc_type.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocAssignment",
+      "table": "empdoc_assignment",
+      "columns": [
+        "id",
+        "reg_id",
+        "package_id",
+        "file_id",
+        "employee_id",
+        "mode",
+        "status",
+        "pdf_path",
+        "sha256",
+        "text_confirmed",
+        "phone_snapshot",
+        "ip",
+        "device",
+        "sent_at",
+        "first_open_at",
+        "confirmed_at",
+        "signed_at",
+        "reminded_at",
+        "receipt_path",
+        "signed_pdf_path",
+        "form_answers",
+        "final_pdf_path",
+        "manual_upload_path",
+        "manual_status"
+      ],
+      "references": [
+        "empdoc_package.id",
+        "empdoc_file.id",
+        "employee.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocTemplate",
+      "table": "empdoc_template",
+      "columns": [
+        "id",
+        "doc_type_id",
+        "name_es",
+        "version",
+        "body_html",
+        "form_json",
+        "firma_empresa",
+        "status",
+        "created_by",
+        "published_by",
+        "created_at",
+        "updated_at",
+        "published_at"
+      ],
+      "references": [
+        "empdoc_type.id",
+        "user.id",
+        "user.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocSetting",
+      "table": "empdoc_setting",
+      "columns": [
+        "id",
+        "skey",
+        "sval",
+        "updated_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocExtField",
+      "table": "empdoc_ext_field",
+      "columns": [
+        "id",
+        "fkey",
+        "label_zh",
+        "ftype",
+        "options_json",
+        "required",
+        "sort",
+        "active",
+        "builtin",
+        "updated_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocExtValue",
+      "table": "empdoc_ext_value",
+      "columns": [
+        "id",
+        "employee_id",
+        "fkey",
+        "value",
+        "updated_at"
+      ],
+      "references": [
+        "employee.id"
+      ],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocExtChange",
+      "table": "empdoc_ext_change",
+      "columns": [
+        "id",
+        "employee_id",
+        "fkey",
+        "old_value",
+        "new_value",
+        "changed_by",
+        "changed_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocConsulta",
+      "table": "empdoc_consulta",
+      "columns": [
+        "id",
+        "assignment_id",
+        "employee_id",
+        "reason",
+        "note",
+        "status",
+        "created_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    },
+    {
+      "model": "EmpDocOtp",
+      "table": "empdoc_otp",
+      "columns": [
+        "id",
+        "package_id",
+        "employee_id",
+        "code",
+        "sent_at",
+        "expires_at",
+        "attempts",
+        "locked",
+        "verified_at",
+        "aids"
+      ],
+      "references": [
+        "empdoc_package.id",
+        "employee.id"
+      ],
+      "migration": "invalidate_codes_preserve_audit"
+    },
+    {
+      "model": "EmpDocLog",
+      "table": "empdoc_log",
+      "columns": [
+        "id",
+        "package_id",
+        "assignment_id",
+        "employee_id",
+        "actor_user_id",
+        "action",
+        "detail",
+        "ip",
+        "device",
+        "created_at"
+      ],
+      "references": [],
+      "migration": "preserve"
+    }
+  ]
+}
